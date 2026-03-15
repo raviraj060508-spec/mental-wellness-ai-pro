@@ -12,4 +12,3 @@ webrtc_streamer(
     key="camera",
     video_frame_callback=video_frame_callback
 )
-  
