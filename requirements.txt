@@ -2,7 +2,4 @@ streamlit
 numpy
 pandas
 scikit-learn
-opencv-python-headless
-librosa
 matplotlib
-fer
