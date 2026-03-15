@@ -1,5 +1,5 @@
-streamlit==1.31.1
-streamlit-webrtc==0.45.0
-opencv-python-headless==4.8.1.78
-av==9.2.0
-numpy==1.24.4
+streamlit
+numpy
+pandas
+scikit-learn
+matplotlib
