@@ -4,19 +4,18 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.ensemble import RandomForestClassifier
 import random
-import time
+from fer import FER
+import cv2
 
 st.set_page_config(page_title="Mental Wellness AI", layout="wide")
 
-st.title("🧠 Mental Wellness AI Monitor")
+st.title("🧠 Mental Wellness AI System")
 
-st.write("AI system to analyze stress and give wellness suggestions.")
+# ----------------------------
+# AI Stress Prediction
+# ----------------------------
 
-# ------------------------------
-# Behavior Stress Prediction
-# ------------------------------
-
-st.header("Behavior Stress Analysis")
+st.header("Behavior Stress Prediction")
 
 typing_speed = st.slider("Typing Speed",20,100,50)
 typing_errors = st.slider("Typing Errors",0,10,2)
@@ -37,62 +36,56 @@ y = np.array([0,2,1,2,0,1,2])
 model = RandomForestClassifier()
 model.fit(X,y)
 
-stress_level = None
-
-if st.button("Predict Stress Level"):
+if st.button("Predict Stress"):
 
     prediction = model.predict([[typing_speed,typing_errors,screen_time]])
 
     if prediction == 0:
-        stress_level = "Relaxed"
         st.success("Relaxed 😊")
-
     elif prediction == 1:
-        stress_level = "Moderate"
         st.warning("Moderate Stress 😐")
-
     else:
-        stress_level = "High"
         st.error("High Stress 😟")
 
-# ------------------------------
-# Mental Health Score
-# ------------------------------
+# ----------------------------
+# Face Emotion Detection
+# ----------------------------
 
-st.header("Mental Health Score")
+st.header("Face Emotion Detection")
 
-if stress_level == "Relaxed":
-    score = 90
-elif stress_level == "Moderate":
-    score = 60
-elif stress_level == "High":
-    score = 30
-else:
-    score = 75
+run = st.checkbox("Start Camera")
 
-st.metric("Mental Wellness Score", score)
+FRAME_WINDOW = st.image([])
 
-# ------------------------------
-# Real-time Stress Monitor
-# ------------------------------
+camera = cv2.VideoCapture(0)
 
-st.header("Real-Time Stress Monitor")
+emotion_detector = FER()
 
-placeholder = st.empty()
+while run:
 
-if st.button("Start Monitoring"):
+    ret, frame = camera.read()
 
-    for i in range(5):
+    if not ret:
+        st.write("Camera not detected")
+        break
 
-        level = random.choice(["Relaxed","Moderate","High"])
+    emotions = emotion_detector.detect_emotions(frame)
 
-        placeholder.metric("Current Stress", level)
+    if emotions:
 
-        time.sleep(2)
+        emotion = max(emotions[0]["emotions"], key=emotions[0]["emotions"].get)
 
-# ------------------------------
-# Weekly Stress Dashboard
-# ------------------------------
+        cv2.putText(frame, emotion, (50,50),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    1,(0,255,0),2)
+
+    FRAME_WINDOW.image(frame)
+
+camera.release()
+
+# ----------------------------
+# Stress Trend Chart
+# ----------------------------
 
 st.header("Weekly Stress Trend")
 
@@ -105,18 +98,15 @@ fig, ax = plt.subplots()
 
 ax.plot(data["Day"], data["Stress"], marker="o")
 
-ax.set_xlabel("Day")
-ax.set_ylabel("Stress Level")
-
 st.pyplot(fig)
 
-# ------------------------------
-# AI Wellness Suggestions
-# ------------------------------
+# ----------------------------
+# Wellness Suggestions
+# ----------------------------
 
 st.header("AI Wellness Suggestions")
 
-if st.button("Get Wellness Tip"):
+if st.button("Get Tip"):
 
     tips = [
         "Take a short walk",
@@ -124,11 +114,8 @@ if st.button("Get Wellness Tip"):
         "Drink water",
         "Take a break from screens",
         "Listen to relaxing music",
-        "Stretch your body",
-        "Talk with a friend"
+        "Stretch your body"
     ]
 
     st.info(random.choice(tips))
-
-
        
