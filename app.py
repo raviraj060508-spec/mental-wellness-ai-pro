@@ -1,25 +1,26 @@
 import streamlit as st
 import numpy as np
-from sklearn.ensemble import RandomForestClassifier
 import pandas as pd
 import matplotlib.pyplot as plt
+from sklearn.ensemble import RandomForestClassifier
 import random
+import time
 
-st.title("AI Mental Stress Detection Prototype")
+st.set_page_config(page_title="Mental Wellness AI", layout="wide")
 
-st.write("Prototype system for predicting stress based on behavior.")
+st.title("🧠 Mental Wellness AI Monitor")
 
-# -----------------------------
-# User Inputs
-# -----------------------------
+st.write("Prototype system for detecting stress and giving wellness suggestions.")
+
+# ------------------------------
+# Behavior Stress Prediction
+# ------------------------------
+
+st.header("Behavior Stress Analysis")
 
 typing_speed = st.slider("Typing Speed",20,100,50)
 typing_errors = st.slider("Typing Errors",0,10,2)
 screen_time = st.slider("Screen Time (hours)",0,10,3)
-
-# -----------------------------
-# Simple Training Data
-# -----------------------------
 
 X = np.array([
 [65,1,2],
@@ -36,26 +37,62 @@ y = np.array([0,2,1,2,0,1,2])
 model = RandomForestClassifier()
 model.fit(X,y)
 
-# -----------------------------
-# Prediction
-# -----------------------------
+stress_level = None
 
-if st.button("Predict Stress"):
+if st.button("Predict Stress Level"):
 
     prediction = model.predict([[typing_speed,typing_errors,screen_time]])
 
     if prediction == 0:
+        stress_level = "Relaxed"
         st.success("Relaxed 😊")
 
     elif prediction == 1:
+        stress_level = "Moderate"
         st.warning("Moderate Stress 😐")
 
     else:
+        stress_level = "High"
         st.error("High Stress 😟")
 
-# -----------------------------
-# Stress Trend Chart
-# -----------------------------
+# ------------------------------
+# Mental Health Score
+# ------------------------------
+
+st.header("Mental Health Score")
+
+if stress_level == "Relaxed":
+    score = 90
+elif stress_level == "Moderate":
+    score = 60
+elif stress_level == "High":
+    score = 30
+else:
+    score = 75
+
+st.metric("Mental Wellness Score", score)
+
+# ------------------------------
+# Real-time Stress Monitor
+# ------------------------------
+
+st.header("Real-Time Stress Monitor")
+
+placeholder = st.empty()
+
+if st.button("Start Monitoring"):
+
+    for i in range(5):
+
+        level = random.choice(["Relaxed","Moderate","High"])
+
+        placeholder.metric("Current Stress", level)
+
+        time.sleep(2)
+
+# ------------------------------
+# Weekly Stress Dashboard
+# ------------------------------
 
 st.header("Weekly Stress Trend")
 
@@ -68,22 +105,29 @@ fig, ax = plt.subplots()
 
 ax.plot(data["Day"], data["Stress"], marker="o")
 
+ax.set_xlabel("Day")
+ax.set_ylabel("Stress Level")
+
 st.pyplot(fig)
 
-# -----------------------------
-# Wellness Suggestions
-# -----------------------------
+# ------------------------------
+# AI Wellness Suggestions
+# ------------------------------
 
-st.header("Wellness Suggestions")
+st.header("AI Wellness Suggestions")
 
-if st.button("Get Suggestion"):
+if st.button("Get Wellness Tip"):
 
     tips = [
         "Take a short walk",
-        "Drink water",
         "Practice deep breathing",
+        "Drink water",
+        "Take a break from screens",
         "Listen to relaxing music",
-        "Take a short break from screens"
+        "Stretch your body",
+        "Talk with a friend"
     ]
 
     st.info(random.choice(tips))
+
+
