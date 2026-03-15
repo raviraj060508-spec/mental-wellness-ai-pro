@@ -1,7 +1,6 @@
 streamlit
-opencv-python
-fer
+opencv-python-headless
 numpy
-pandas
-scikit-learn
-matplotlib
+streamlit-webrtc
+fer
+av
